@@ -1,121 +1,136 @@
-// Author:
+// Author: Elijah Hynson
 
-/*******************************************************************************
-                          Global UI Variables
+//global UI vars
+let canvasDiv;
 
-  canvasDiv, textDiv, buttonDiv
-  In the project's HTML, the divs that will contain various elements that may
-  be created in setup(). Useful for styling (e.g., keeping them all centered).
+let canvas;
 
-  canvas
-  The p5.js canvas. This is where all the magic happens!
+let textDiv;
 
-  textP
-  This is where you will print any kind of text (e.g., the label of an image).
+let textP;
 
-  buttons
-  If included, these are for user interaction (e.g., training a model, inputting
-  data).
-*******************************************************************************/
+let buttonDiv;
 
-//let canvasDiv;
+let resetButton;
 
-/*******************************************************************************
-                          Global Game Variables
+//global Game vars
+let snake;
 
-  snake
-  A snake object, represented as an array of vectors. The player character!
+let food;
 
-  food
-  A food object, represented as a single vector. The thing the snake eats!
+let resolution;
 
-  resolution
-  The resolution of the canvas. Used for graphics scaling.
+let scaledWidth;
 
-  scaledWidth, scaledHeight
-  Values representing the scaled width and height of the canvas, after
-  resolution is taken into account.
+let scaledHeight;
 
-  score
-  The player's score. Eating food increases the score by 1.
-*******************************************************************************/
+let score;
 
-//let snake;
-
-/******************************************************************************
-                                  setup()
-
-  This is a built-in p5.js function that is automatically called when the
-  program starts, just before draw(). This is used for initializing global
-  variables, building the UI, and loading images, video, data, and models.
-*******************************************************************************/
 
 function setup() {
-  // Build the interface
+ //canvas interface
+  canvasDiv = createDiv();
+  canvas = createCanvas(640,480);
+  canvas.parent(canvasDiv);
 
-  // Set the resolution to 20. Play with this later if you want.
+  //text interface
+  textDiv = createDiv();
+  textP = createP();
+  textP.parent(textDiv);
 
-  // Scaled width and height are width / resolution, height / resolution
+  //button interface
+  buttonDiv = createDiv();
+  resetButton = createButton("Reset Game");
+  resetButton.mousePressed(resetGame);
+  resetButton.parent(buttonDiv);
 
-  // Set the game's framerate to 5 (or whatever you prefer)
+  resolution = 20;
+  
+  scaledWidth = floor(width / resolution);
+  scaledHeight = floor(height / resolution);
 
-  // Call resetGame() to initialize everything else.
+  frameRate(15); 
+
+  resetGame();
 
 }
 
-/******************************************************************************
-                                  draw()
 
-  This is a built-in p5.js function that is automatically called in a repeated
-  loop, just after setup(). This is used for handling animations, or running
-  anything over and over again throughout a program.
-*******************************************************************************/
 
 function draw() {
-  // Scale the canvas according to resolution, then refresh the background
+  scale(resolution);
+  background(220);
 
-  // Check if snake is eating the food
+  noStroke();
 
-  // Draw the snake
+  fill(255, 0, 0);
 
-  // Draw the food
+  rect(food.x, food.y, 1, 1);
 
-  // Check for game over
+  if(snake.eat(food)) {
+
+  createFood();
+  score++;
+  textP.html("Score: " + score);
+
+
+  };
+
+  if(snake.endGame()) {
+
+  textP.html("YOU LOSE. Final Score: " + score);
+
+  background(255, 0, 0);
+
+  noLoop();
+
+  buttonDiv.style("display", "block");
+
+}
+  
+  snake.update();
+  snake.show();
 
 }
 
-/******************************************************************************
-                                createFood()
 
-  Creates food and places it at a random location on the (scaled) canvas.
-*******************************************************************************/
 
 function createFood() {
+  let x = floor(random(scaledWidth));
 
+  let y = floor(random(scaledHeight));  
+
+  food = createVector(x, y);
 }
 
-/******************************************************************************
-                                keyPressed()
 
-  A built-in function in p5.js. Checks if keys are pressed. You can create
-  interactive controls with this function!
-*******************************************************************************/
 
 function keyPressed() {
+if(keyCode === UP_ARROW && snake.yDirection === 0) {
 
+  snake.setDirection(0, -1);
+
+} else if(keyCode === DOWN_ARROW && snake.yDirection === 0) {
+
+  snake.setDirection(0, 1);
+
+} else if(keyCode === LEFT_ARROW && snake.xDirection === 0) {
+
+  snake.setDirection(-1, 0);
+
+} else if(keyCode === RIGHT_ARROW && snake.xDirection === 0) {
+
+  snake.setDirection(1, 0);
+
+} 
 }
 
-/******************************************************************************
-                                resetGame()
-
-  A callback function. When resetButton is clicked, it calls this function. We
-  can also call this function in setup() to initialize many things in the game.
-
-  Create a new snake, reset score to 0, and place the food in a random
-  location. Call loop() to make the game continue on. Finally, hide the button
-  div again.
-*******************************************************************************/
 
 function resetGame() {
-
+  snake = new Snake();
+  createFood();
+  score = 0;
+  textP.html("Score: " + score);
+  loop();
+  buttonDiv.style("display", "none");
 }
