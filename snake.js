@@ -29,7 +29,19 @@ class Snake {
 
   }
 
-  return false;
+  for(let i = 0; i < this.body.length - 1; i++) {
+
+    let part = this.body[i];
+
+  if(part.x === head.x && part.y === head.y) {
+
+    return true;
+
+  }
+
+}
+
+return false;
 }
 
 
